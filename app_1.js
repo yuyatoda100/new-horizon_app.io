@@ -427,20 +427,23 @@ let currentMode = "en-ja"; // 'en-ja': 英語➔日本語, 'ja-en': 日本語➔
 let currentFilteredWords = [];
 let isAnswered = false;
 
-// 成績記録用データ
-let correctWords = [];
-let incorrectWords = [];
+// 今回の成績記録用
+let sessionCorrectWords = [];
+let sessionIncorrectWords = [];
+
+// 永続保存用の間違えた問題リスト (ID配列で管理)
+let savedIncorrectIds = JSON.parse(localStorage.getItem("incorrect_word_ids") || "[]");
 
 const availableUnits = [...new Set(Words.map(w => w.unit))];
 
 document.addEventListener("DOMContentLoaded", () => {
   renderUnitSelection();
+  renderHomeIncorrectBox();
   updateModeButtonsState();
 });
 
-// モード切替（トップ画面でのみ動作可能）
+// モード切替
 function setMode(mode) {
-  // トップ画面にいない場合は切り替えを無視する
   const isHomeVisible = !document.getElementById("home-container").classList.contains("hidden");
   if (!isHomeVisible) return;
 
@@ -449,17 +452,12 @@ function setMode(mode) {
   document.getElementById("mode-ja-en").classList.toggle("active", mode === "ja-en");
 }
 
-// 画面状態に応じてモード切替ボタンの有効/無効を更新
 function updateModeButtonsState() {
   const isHomeVisible = !document.getElementById("home-container").classList.contains("hidden");
-  const btnEnJa = document.getElementById("mode-en-ja");
-  const btnJaEn = document.getElementById("mode-ja-en");
-
-  btnEnJa.disabled = !isHomeVisible;
-  btnJaEn.disabled = !isHomeVisible;
+  document.getElementById("mode-en-ja").disabled = !isHomeVisible;
+  document.getElementById("mode-ja-en").disabled = !isHomeVisible;
 }
 
-// トップ画面のUnitボタン一覧生成
 function renderUnitSelection() {
   const container = document.getElementById("unit-selection-list");
   if (!container) return;
@@ -479,7 +477,39 @@ function renderUnitSelection() {
   container.innerHTML = html;
 }
 
-// 配列をシャッフルするヘルパー関数
+// ホーム画面の間違えた問題リスト描画
+function renderHomeIncorrectBox() {
+  const box = document.getElementById("home-incorrect-box");
+  const countEl = document.getElementById("home-incorrect-count");
+  const listEl = document.getElementById("home-incorrect-list");
+
+  const incorrectWords = Words.filter(w => savedIncorrectIds.includes(w.id));
+
+  if (incorrectWords.length === 0) {
+    box.classList.add("hidden");
+    return;
+  }
+
+  box.classList.remove("hidden");
+  countEl.textContent = incorrectWords.length;
+
+  listEl.innerHTML = incorrectWords.map(w => `
+    <li>
+      <span class="inc-word">${w.word}</span>
+      <span class="inc-meaning">${w.meaning}</span>
+    </li>
+  `).join("");
+}
+
+// 履歴クリア
+function clearSavedIncorrect() {
+  if (confirm("復習ノートの履歴をすべて削除しますか？")) {
+    savedIncorrectIds = [];
+    localStorage.removeItem("incorrect_word_ids");
+    renderHomeIncorrectBox();
+  }
+}
+
 function shuffleArray(array) {
   const arr = [...array];
   for (let i = arr.length - 1; i > 0; i--) {
@@ -489,15 +519,11 @@ function shuffleArray(array) {
   return arr;
 }
 
-// クイズ開始
+// クイズ開始（Unit選択）
 function startQuiz(unitName) {
   currentUnit = unitName;
-  currentIndex = 0;
-  correctWords = [];
-  incorrectWords = [];
-
-  // 対象単語のフィルタリング
   let baseWords = [];
+
   if (unitName === "ALL") {
     baseWords = [...Words];
     document.getElementById("quiz-unit-title").textContent = "すべての単語 (全復習)";
@@ -506,11 +532,9 @@ function startQuiz(unitName) {
     document.getElementById("quiz-unit-title").textContent = unitName;
   }
 
-  // シャッフル処理
   const shuffled = shuffleArray(baseWords);
-
-  // 出題数の決定
   const countSelect = document.getElementById("question-count-select").value;
+
   if (countSelect === "all") {
     currentFilteredWords = shuffled;
   } else {
@@ -518,11 +542,41 @@ function startQuiz(unitName) {
     currentFilteredWords = shuffled.slice(0, limit);
   }
 
+  initQuizState();
+}
+
+// トップ画面からの「間違えた問題だけでテスト」開始
+function startIncorrectQuiz() {
+  const incorrectWords = Words.filter(w => savedIncorrectIds.includes(w.id));
+  if (incorrectWords.length === 0) return;
+
+  currentUnit = "INCORRECT_ONLY";
+  document.getElementById("quiz-unit-title").textContent = "復習ノートのテスト";
+
+  const shuffled = shuffleArray(incorrectWords);
+  const countSelect = document.getElementById("question-count-select").value;
+
+  if (countSelect === "all") {
+    currentFilteredWords = shuffled;
+  } else {
+    const limit = parseInt(countSelect, 10);
+    currentFilteredWords = shuffled.slice(0, limit);
+  }
+
+  initQuizState();
+}
+
+function initQuizState() {
+  currentIndex = 0;
+  sessionCorrectWords = [];
+  sessionIncorrectWords = [];
+
   showScreen("quiz-container");
   updateQuestion();
 }
 
 function showHome() {
+  renderHomeIncorrectBox();
   showScreen("home-container");
 }
 
@@ -532,8 +586,6 @@ function showScreen(screenId) {
   document.getElementById("result-container").classList.add("hidden");
 
   document.getElementById(screenId).classList.remove("hidden");
-  
-  // モードボタンの活性/非活性状態を更新
   updateModeButtonsState();
 }
 
@@ -588,11 +640,21 @@ function handleCheck(event) {
     isCorrect = (cleanUser === cleanTarget);
   }
 
+  // 保存データの更新
   if (isCorrect) {
-    correctWords.push(currentWord);
+    sessionCorrectWords.push(currentWord);
+    // 正解したら保存された間違えたリストから取り除く
+    savedIncorrectIds = savedIncorrectIds.filter(id => id !== currentWord.id);
   } else {
-    incorrectWords.push(currentWord);
+    sessionIncorrectWords.push(currentWord);
+    // 不正解なら間違えたリストに追加（重複排除）
+    if (!savedIncorrectIds.includes(currentWord.id)) {
+      savedIncorrectIds.push(currentWord.id);
+    }
   }
+
+  // localStorageに永続化
+  localStorage.setItem("incorrect_word_ids", JSON.stringify(savedIncorrectIds));
 
   showFeedback(isCorrect, currentWord);
 }
@@ -631,18 +693,18 @@ function nextQuestion() {
 function showResult() {
   showScreen("result-container");
 
-  document.getElementById("score-correct").textContent = correctWords.length;
-  document.getElementById("score-incorrect").textContent = incorrectWords.length;
+  document.getElementById("score-correct").textContent = sessionCorrectWords.length;
+  document.getElementById("score-incorrect").textContent = sessionIncorrectWords.length;
 
   const listContainer = document.getElementById("incorrect-list-container");
   const listEl = document.getElementById("incorrect-list");
   const retryBtn = document.getElementById("retry-incorrect-btn");
 
-  if (incorrectWords.length > 0) {
+  if (sessionIncorrectWords.length > 0) {
     listContainer.classList.remove("hidden");
     retryBtn.classList.remove("hidden");
 
-    listEl.innerHTML = incorrectWords.map(w => `
+    listEl.innerHTML = sessionIncorrectWords.map(w => `
       <li>
         <span class="inc-word">${w.word}</span>
         <span class="inc-meaning">${w.meaning}</span>
@@ -655,12 +717,6 @@ function showResult() {
 }
 
 function retryIncorrect() {
-  currentFilteredWords = shuffleArray([...incorrectWords]);
-  currentIndex = 0;
-  correctWords = [];
-  incorrectWords = [];
-
-  document.getElementById("quiz-unit-title").textContent = "間違えた問題の復習";
-  showScreen("quiz-container");
-  updateQuestion();
+  currentFilteredWords = shuffleArray([...sessionIncorrectWords]);
+  initQuizState();
 }
