@@ -60,7 +60,6 @@ header h1 {
     border-color: #3182ce;
 }
 
-/* クイズ実行中の無効状態 */
 .mode-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -93,6 +92,45 @@ header h1 {
     background-color: #fff;
     outline: none;
     cursor: pointer;
+}
+
+/* トップ画面: 復習ノート (間違えた単語一覧) */
+.home-incorrect-box {
+    margin-bottom: 20px;
+    background-color: #fff5f5;
+    border: 1px solid #fed7d7;
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.home-incorrect-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.home-incorrect-header h3 {
+    font-size: 0.9rem;
+    color: #c53030;
+}
+
+.clear-btn {
+    background: none;
+    border: none;
+    color: #e53e3e;
+    font-size: 0.75rem;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.retry-btn {
+    margin-top: 10px;
+    background-color: #e53e3e;
+}
+
+.retry-btn:hover {
+    background-color: #c53030;
 }
 
 /* トップ画面 */
@@ -262,6 +300,30 @@ header h1 {
     margin-bottom: 12px;
 }
 
+/* 共通リスト用スタイル */
+.incorrect-list {
+    list-style: none;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.incorrect-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px dashed #feb2b2;
+    font-size: 0.85rem;
+}
+
+.inc-word {
+    font-weight: bold;
+    color: #2d3748;
+}
+
+.inc-meaning {
+    color: #718096;
+}
+
 /* 結果画面 */
 #result-container {
     text-align: center;
@@ -303,29 +365,6 @@ header h1 {
     font-size: 0.95rem;
     color: #c53030;
     margin-bottom: 10px;
-}
-
-.incorrect-list {
-    list-style: none;
-    max-height: 180px;
-    overflow-y: auto;
-}
-
-.incorrect-list li {
-    display: flex;
-    justify-content: space-between;
-    padding: 6px 0;
-    border-bottom: 1px dashed #feb2b2;
-    font-size: 0.9rem;
-}
-
-.inc-word {
-    font-weight: bold;
-    color: #2d3748;
-}
-
-.inc-meaning {
-    color: #718096;
 }
 
 .result-actions {
