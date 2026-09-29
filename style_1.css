@@ -34,7 +34,7 @@ header h1 {
     display: none !important;
 }
 
-/* Mode選択ボタン */
+/* Mode選択 */
 .mode-selector {
     display: flex;
     gap: 8px;
@@ -51,6 +51,7 @@ header h1 {
     color: #4a5568;
     border-radius: 6px;
     cursor: pointer;
+    transition: opacity 0.2s;
 }
 
 .mode-btn.active {
@@ -59,7 +60,42 @@ header h1 {
     border-color: #3182ce;
 }
 
-/* トップ画面（Unit選択） */
+/* クイズ実行中の無効状態 */
+.mode-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* 出題数設定エリア */
+.settings-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    background-color: #f8fafc;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.settings-box label {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #4a5568;
+}
+
+.settings-box select {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    border-radius: 6px;
+    border: 1px solid #cbd5e0;
+    background-color: #fff;
+    outline: none;
+    cursor: pointer;
+}
+
+/* トップ画面 */
 #home-container h2 {
     font-size: 1rem;
     color: #4a5568;
@@ -91,7 +127,6 @@ header h1 {
     color: #2b6cb0;
 }
 
-/* 全復習ボタン用スタイル */
 .all-words-btn {
     grid-column: span 2;
     background-color: #feebc8;
@@ -102,10 +137,9 @@ header h1 {
 .all-words-btn:hover {
     background-color: #fbd38d;
     border-color: #f6ad55;
-    color: #742a2a;
 }
 
-/* 問題画面ヘッダー */
+/* 問題画面 */
 .quiz-header {
     display: flex;
     justify-content: space-between;
@@ -128,7 +162,6 @@ header h1 {
     color: #4a5568;
 }
 
-/* クイズカード */
 .quiz-card {
     text-align: center;
 }
@@ -153,7 +186,6 @@ header h1 {
     min-height: 2.5rem;
 }
 
-/* 入力フォーム & ボタン */
 #type-form {
     display: flex;
     flex-direction: column;
@@ -202,7 +234,6 @@ header h1 {
     font-weight: bold;
 }
 
-/* フィードバック表示 */
 .feedback-container {
     margin-top: 15px;
     padding: 12px;
@@ -229,4 +260,76 @@ header h1 {
     font-size: 0.95rem;
     color: #2d3748;
     margin-bottom: 12px;
+}
+
+/* 結果画面 */
+#result-container {
+    text-align: center;
+}
+
+#result-container h2 {
+    font-size: 1.3rem;
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+.result-stats {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.score-correct {
+    color: #38a169;
+}
+
+.score-incorrect {
+    color: #e53e3e;
+}
+
+.incorrect-list-container {
+    margin-bottom: 20px;
+    text-align: left;
+    background-color: #fff5f5;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #fed7d7;
+}
+
+.incorrect-list-container h3 {
+    font-size: 0.95rem;
+    color: #c53030;
+    margin-bottom: 10px;
+}
+
+.incorrect-list {
+    list-style: none;
+    max-height: 180px;
+    overflow-y: auto;
+}
+
+.incorrect-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px dashed #feb2b2;
+    font-size: 0.9rem;
+}
+
+.inc-word {
+    font-weight: bold;
+    color: #2d3748;
+}
+
+.inc-meaning {
+    color: #718096;
+}
+
+.result-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
