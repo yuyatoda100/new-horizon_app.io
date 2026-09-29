@@ -18,7 +18,7 @@
             <button id="mode-ja-en" class="mode-btn" onclick="setMode('ja-en')">日 ➔ 英 (英語入力)</button>
         </div>
 
-        <!-- 1. トップ画面 (設定 & Unit・全復習選択) -->
+        <!-- 1. トップ画面 (設定 & Unit・全復習選択 & 復習ノート) -->
         <main id="home-container">
             <div class="settings-box">
                 <label for="question-count-select">出題数:</label>
@@ -27,6 +27,16 @@
                     <option value="20">20問</option>
                     <option value="all">全問</option>
                 </select>
+            </div>
+
+            <!-- 間違えた問題の復習ノート (トップ画面) -->
+            <div id="home-incorrect-box" class="home-incorrect-box hidden">
+                <div class="home-incorrect-header">
+                    <h3>📝 復習ノート (要復習: <span id="home-incorrect-count">0</span>件)</h3>
+                    <button class="clear-btn" onclick="clearSavedIncorrect()">履歴クリア</button>
+                </div>
+                <ul id="home-incorrect-list" class="incorrect-list"></ul>
+                <button class="start-btn retry-btn" onclick="startIncorrectQuiz()">間違えた問題だけでテスト</button>
             </div>
 
             <h2>学習するUnitを選択してください</h2>
@@ -67,7 +77,7 @@
             </div>
 
             <div id="incorrect-list-container" class="incorrect-list-container">
-                <h3>間違えた単語</h3>
+                <h3>今回間違えた単語</h3>
                 <ul id="incorrect-list" class="incorrect-list"></ul>
             </div>
 
