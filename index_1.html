@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEW HORIZON 英単語タイピングアプリ</title>
+    <link rel="stylesheet" href="style_1.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>NEW HORIZON 英単語タイピング</h1>
+        </header>
+
+        <!-- Mode選択（共通） -->
+        <div class="mode-selector">
+            <button id="mode-en-ja" class="mode-btn active" onclick="setMode('en-ja')">英 ➔ 日 (日本語入力)</button>
+            <button id="mode-ja-en" class="mode-btn" onclick="setMode('ja-en')">日 ➔ 英 (英語入力)</button>
+        </div>
+
+        <!-- 1. トップ画面 (Unit・全復習選択) -->
+        <main id="home-container">
+            <h2>学習するUnitを選択してください</h2>
+            <div id="unit-selection-list" class="unit-grid"></div>
+        </main>
+
+        <!-- 2. タイピング問題画面 (初期状態は非表示) -->
+        <main id="quiz-container" class="hidden">
+            <div class="quiz-header">
+                <button class="back-btn" onclick="showHome()">← 戻る</button>
+                <span id="quiz-unit-title" class="quiz-unit-title">Unit 0</span>
+            </div>
+
+            <div class="quiz-card">
+                <div id="progress" class="question-number">1 / 10</div>
+                <div id="prompt-label" class="prompt-label">問題 (英語)</div>
+                <div id="card-word" class="word-display">discover</div>
+                
+                <form id="type-form" onsubmit="handleCheck(event)">
+                    <input type="text" id="type-input" placeholder="回答を入力してEnter" autocomplete="off" />
+                    <button type="submit" id="submit-btn" class="start-btn">判定</button>
+                </form>
+
+                <div id="feedback-container" class="feedback-container hidden">
+                    <div id="feedback-result" class="feedback-result"></div>
+                    <div id="feedback-answer" class="feedback-answer"></div>
+                    <button id="next-btn" class="secondary-btn" onclick="nextQuestion()">次の問題へ</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app_1.js"></script>
+</body>
+</html>

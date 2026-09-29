@@ -1,0 +1,232 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+#app {
+    width: 100%;
+    max-width: 480px;
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+    text-align: center;
+    font-size: 1.4rem;
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Mode選択ボタン */
+.mode-selector {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.mode-btn {
+    flex: 1;
+    padding: 10px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    border: 1px solid #cbd5e0;
+    background-color: #edf2f7;
+    color: #4a5568;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.mode-btn.active {
+    background-color: #3182ce;
+    color: #ffffff;
+    border-color: #3182ce;
+}
+
+/* トップ画面（Unit選択） */
+#home-container h2 {
+    font-size: 1rem;
+    color: #4a5568;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.unit-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.unit-select-btn {
+    padding: 14px;
+    font-size: 0.95rem;
+    font-weight: bold;
+    color: #2d3748;
+    background-color: #ffffff;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.unit-select-btn:hover {
+    border-color: #3182ce;
+    background-color: #ebf8ff;
+    color: #2b6cb0;
+}
+
+/* 全復習ボタン用スタイル */
+.all-words-btn {
+    grid-column: span 2;
+    background-color: #feebc8;
+    border-color: #fbd38d;
+    color: #742a2a;
+}
+
+.all-words-btn:hover {
+    background-color: #fbd38d;
+    border-color: #f6ad55;
+    color: #742a2a;
+}
+
+/* 問題画面ヘッダー */
+.quiz-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.back-btn {
+    background: none;
+    border: none;
+    color: #3182ce;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.quiz-unit-title {
+    font-size: 0.95rem;
+    font-weight: bold;
+    color: #4a5568;
+}
+
+/* クイズカード */
+.quiz-card {
+    text-align: center;
+}
+
+.question-number {
+    font-size: 0.85rem;
+    color: #7f8c8d;
+    margin-bottom: 5px;
+}
+
+.prompt-label {
+    font-size: 0.9rem;
+    color: #4a5568;
+    margin-bottom: 10px;
+}
+
+.word-display {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    min-height: 2.5rem;
+}
+
+/* 入力フォーム & ボタン */
+#type-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#type-input {
+    width: 100%;
+    padding: 12px;
+    font-size: 1.1rem;
+    border: 2px solid #cbd5e0;
+    border-radius: 8px;
+    text-align: center;
+    outline: none;
+}
+
+#type-input:focus {
+    border-color: #3182ce;
+}
+
+.start-btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #fff;
+    background-color: #3182ce;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.start-btn:hover {
+    background-color: #2b6cb0;
+}
+
+.secondary-btn {
+    width: 100%;
+    padding: 10px;
+    font-size: 0.95rem;
+    color: #fff;
+    background-color: #4a5568;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* フィードバック表示 */
+.feedback-container {
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 8px;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+}
+
+.feedback-result {
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.feedback-result.correct {
+    color: #38a169;
+}
+
+.feedback-result.incorrect {
+    color: #e53e3e;
+}
+
+.feedback-answer {
+    font-size: 0.95rem;
+    color: #2d3748;
+    margin-bottom: 12px;
+}
