@@ -420,7 +420,6 @@ const Words = [
   { "id": 404, "unit": "Unit 6", "word": "not only but also", "meaning": "〜だけでなく〜もまた", "partOfSpeech": "熟語" },
 ];
 
-
 // アプリケーションの状態
 let currentUnit = "";
 let currentIndex = 0;
@@ -428,25 +427,49 @@ let currentMode = "en-ja"; // 'en-ja': 英語➔日本語, 'ja-en': 日本語➔
 let currentFilteredWords = [];
 let isAnswered = false;
 
+// 成績記録用データ
+let correctWords = [];
+let incorrectWords = [];
+
 const availableUnits = [...new Set(Words.map(w => w.unit))];
 
 document.addEventListener("DOMContentLoaded", () => {
   renderUnitSelection();
+  updateModeButtonsState();
 });
 
-// Unit選択画面の描画
+// モード切替（トップ画面でのみ動作可能）
+function setMode(mode) {
+  // トップ画面にいない場合は切り替えを無視する
+  const isHomeVisible = !document.getElementById("home-container").classList.contains("hidden");
+  if (!isHomeVisible) return;
+
+  currentMode = mode;
+  document.getElementById("mode-en-ja").classList.toggle("active", mode === "en-ja");
+  document.getElementById("mode-ja-en").classList.toggle("active", mode === "ja-en");
+}
+
+// 画面状態に応じてモード切替ボタンの有効/無効を更新
+function updateModeButtonsState() {
+  const isHomeVisible = !document.getElementById("home-container").classList.contains("hidden");
+  const btnEnJa = document.getElementById("mode-en-ja");
+  const btnJaEn = document.getElementById("mode-ja-en");
+
+  btnEnJa.disabled = !isHomeVisible;
+  btnJaEn.disabled = !isHomeVisible;
+}
+
+// トップ画面のUnitボタン一覧生成
 function renderUnitSelection() {
   const container = document.getElementById("unit-selection-list");
   if (!container) return;
 
-  // 各Unitボタン + 全単語復習ボタンのHTML作成
   let html = availableUnits.map(unit => `
     <button class="unit-select-btn" onclick="startQuiz('${unit}')">
       ${unit}
     </button>
   `).join("");
 
-  // 「すべての単語（全復習）」ボタンを先頭に追加
   html = `
     <button class="unit-select-btn all-words-btn" onclick="startQuiz('ALL')">
       🌟 すべての単語 (全復習)
@@ -456,42 +479,62 @@ function renderUnitSelection() {
   container.innerHTML = html;
 }
 
-function setMode(mode) {
-  currentMode = mode;
-  document.getElementById("mode-en-ja").classList.toggle("active", mode === "en-ja");
-  document.getElementById("mode-ja-en").classList.toggle("active", mode === "ja-en");
-  
-  // クイズ実行中の場合は表示更新
-  if (!document.getElementById("quiz-container").classList.contains("hidden")) {
-    updateQuestion();
+// 配列をシャッフルするヘルパー関数
+function shuffleArray(array) {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
   }
+  return arr;
 }
 
 // クイズ開始
 function startQuiz(unitName) {
   currentUnit = unitName;
   currentIndex = 0;
+  correctWords = [];
+  incorrectWords = [];
 
+  // 対象単語のフィルタリング
+  let baseWords = [];
   if (unitName === "ALL") {
-    // 全単語をシャッフル
-    currentFilteredWords = [...Words].sort(() => Math.random() - 0.5);
+    baseWords = [...Words];
     document.getElementById("quiz-unit-title").textContent = "すべての単語 (全復習)";
   } else {
-    currentFilteredWords = Words.filter(w => w.unit === unitName);
+    baseWords = Words.filter(w => w.unit === unitName);
     document.getElementById("quiz-unit-title").textContent = unitName;
   }
 
-  // 画面の切り替え
-  document.getElementById("home-container").classList.add("hidden");
-  document.getElementById("quiz-container").classList.remove("hidden");
+  // シャッフル処理
+  const shuffled = shuffleArray(baseWords);
 
+  // 出題数の決定
+  const countSelect = document.getElementById("question-count-select").value;
+  if (countSelect === "all") {
+    currentFilteredWords = shuffled;
+  } else {
+    const limit = parseInt(countSelect, 10);
+    currentFilteredWords = shuffled.slice(0, limit);
+  }
+
+  showScreen("quiz-container");
   updateQuestion();
 }
 
-// トップ画面に戻る
 function showHome() {
-  document.getElementById("home-container").classList.remove("hidden");
+  showScreen("home-container");
+}
+
+function showScreen(screenId) {
+  document.getElementById("home-container").classList.add("hidden");
   document.getElementById("quiz-container").classList.add("hidden");
+  document.getElementById("result-container").classList.add("hidden");
+
+  document.getElementById(screenId).classList.remove("hidden");
+  
+  // モードボタンの活性/非活性状態を更新
+  updateModeButtonsState();
 }
 
 function updateQuestion() {
@@ -524,7 +567,6 @@ function updateQuestion() {
   }
 }
 
-// 解答判定処理
 function handleCheck(event) {
   event.preventDefault();
   if (isAnswered) return;
@@ -537,15 +579,19 @@ function handleCheck(event) {
   let isCorrect = false;
 
   if (currentMode === "en-ja") {
-    // 日本語判定：カンマ分割・記号除外対応
     const targetMeanings = currentWord.meaning.split(/[、,]/).map(m => m.trim().replace(/^〜|~/, ''));
     const cleanInput = userInput.replace(/^〜|~/, '');
     isCorrect = targetMeanings.some(m => cleanInput.includes(m) || m.includes(cleanInput));
   } else {
-    // 英語判定：小文字統一＆記号の除外
     const cleanUser = userInput.toLowerCase().replace(/[^a-z0-9 ']/g, '');
     const cleanTarget = currentWord.word.toLowerCase().replace(/[^a-z0-9 ']/g, '');
     isCorrect = (cleanUser === cleanTarget);
+  }
+
+  if (isCorrect) {
+    correctWords.push(currentWord);
+  } else {
+    incorrectWords.push(currentWord);
   }
 
   showFeedback(isCorrect, currentWord);
@@ -576,10 +622,45 @@ function showFeedback(isCorrect, currentWord) {
 function nextQuestion() {
   if (currentIndex < currentFilteredWords.length - 1) {
     currentIndex++;
+    updateQuestion();
   } else {
-    alert("このUnitの学習が終了しました！トップ画面に戻ります。");
-    showHome();
-    return;
+    showResult();
   }
+}
+
+function showResult() {
+  showScreen("result-container");
+
+  document.getElementById("score-correct").textContent = correctWords.length;
+  document.getElementById("score-incorrect").textContent = incorrectWords.length;
+
+  const listContainer = document.getElementById("incorrect-list-container");
+  const listEl = document.getElementById("incorrect-list");
+  const retryBtn = document.getElementById("retry-incorrect-btn");
+
+  if (incorrectWords.length > 0) {
+    listContainer.classList.remove("hidden");
+    retryBtn.classList.remove("hidden");
+
+    listEl.innerHTML = incorrectWords.map(w => `
+      <li>
+        <span class="inc-word">${w.word}</span>
+        <span class="inc-meaning">${w.meaning}</span>
+      </li>
+    `).join("");
+  } else {
+    listContainer.classList.add("hidden");
+    retryBtn.classList.add("hidden");
+  }
+}
+
+function retryIncorrect() {
+  currentFilteredWords = shuffleArray([...incorrectWords]);
+  currentIndex = 0;
+  correctWords = [];
+  incorrectWords = [];
+
+  document.getElementById("quiz-unit-title").textContent = "間違えた問題の復習";
+  showScreen("quiz-container");
   updateQuestion();
 }
