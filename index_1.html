@@ -3,8 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEW HORIZON 英単語タイピングアプリ</title>
+    <meta name="description" content="NEW HORIZON3の英単語をタイピングで学べるアプリ">
+    <meta name="theme-color" content="#4A90E2">
+    
+    <!-- PWA対応 -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="英単語アプリ">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon-192.png">
     <link rel="stylesheet" href="style_1.css">
+    
+    <title>NEW HORIZON 英単語タイピングアプリ</title>
 </head>
 <body>
     <div id="app">
@@ -51,5 +64,28 @@
     </div>
 
     <script src="app_1.js"></script>
+    <script>
+        // Service Workerの登録
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        console.log('Service Worker登録成功:', registration);
+                    })
+                    .catch(error => {
+                        console.log('Service Worker登録失敗:', error);
+                    });
+            });
+        }
+
+        // PWAのインストール促進
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            // インストール可能な状態を示すUIを表示
+            console.log('インストール可能です');
+        });
+    </script>
 </body>
 </html>
