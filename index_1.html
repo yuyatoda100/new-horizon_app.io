@@ -3,21 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="NEW HORIZON3の英単語をタイピングで学べるアプリ">
-    <meta name="theme-color" content="#4A90E2">
-    
-    <!-- PWA対応 -->
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="英単語アプリ">
-    <link rel="apple-touch-icon" href="icon-192.png">
-    
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/png" href="icon-192.png">
-    <link rel="stylesheet" href="style_1.css">
-    
     <title>NEW HORIZON 英単語タイピングアプリ</title>
+    <link rel="stylesheet" href="style_1.css">
 </head>
 <body>
     <div id="app">
@@ -31,13 +18,22 @@
             <button id="mode-ja-en" class="mode-btn" onclick="setMode('ja-en')">日 ➔ 英 (英語入力)</button>
         </div>
 
-        <!-- 1. トップ画面 (Unit・全復習選択) -->
+        <!-- 1. トップ画面 (設定 & Unit・全復習選択) -->
         <main id="home-container">
+            <div class="settings-box">
+                <label for="question-count-select">出題数:</label>
+                <select id="question-count-select">
+                    <option value="10" selected>10問</option>
+                    <option value="20">20問</option>
+                    <option value="all">全問</option>
+                </select>
+            </div>
+
             <h2>学習するUnitを選択してください</h2>
             <div id="unit-selection-list" class="unit-grid"></div>
         </main>
 
-        <!-- 2. タイピング問題画面 (初期状態は非表示) -->
+        <!-- 2. タイピング問題画面 -->
         <main id="quiz-container" class="hidden">
             <div class="quiz-header">
                 <button class="back-btn" onclick="showHome()">← 戻る</button>
@@ -61,31 +57,27 @@
                 </div>
             </div>
         </main>
+
+        <!-- 3. 結果画面 -->
+        <main id="result-container" class="hidden">
+            <h2>🎉 学習完了！</h2>
+            <div class="result-stats">
+                <p>正解: <span id="score-correct" class="score-correct">0</span> 問</p>
+                <p>不正解: <span id="score-incorrect" class="score-incorrect">0</span> 問</p>
+            </div>
+
+            <div id="incorrect-list-container" class="incorrect-list-container">
+                <h3>間違えた単語</h3>
+                <ul id="incorrect-list" class="incorrect-list"></ul>
+            </div>
+
+            <div class="result-actions">
+                <button id="retry-incorrect-btn" class="start-btn hidden" onclick="retryIncorrect()">間違えた問題だけ復習</button>
+                <button class="secondary-btn" onclick="showHome()">Top画面へ戻る</button>
+            </div>
+        </main>
     </div>
 
     <script src="app_1.js"></script>
-    <script>
-        // Service Workerの登録
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(registration => {
-                        console.log('Service Worker登録成功:', registration);
-                    })
-                    .catch(error => {
-                        console.log('Service Worker登録失敗:', error);
-                    });
-            });
-        }
-
-        // PWAのインストール促進
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            // インストール可能な状態を示すUIを表示
-            console.log('インストール可能です');
-        });
-    </script>
 </body>
 </html>
