@@ -1,8 +1,8 @@
 // Service Worker - キャッシング戦略
-const CACHE_NAME = 'new-horizon-v1';
+const CACHE_NAME = 'new-horizon-v2';
 const urlsToCache = [
   './',
-  './index_1.html',
+  './index.html',
   './style_1.css',
   './app_1.js',
   './manifest.json',
@@ -67,7 +67,7 @@ self.addEventListener('fetch', event => {
         return response;
       }).catch(() => {
         // オフライン時はキャッシュから取得、なければオフラインページを返却
-        return caches.match('./index_1.html');
+        return caches.match('./index.html');
       });
     })
   );
